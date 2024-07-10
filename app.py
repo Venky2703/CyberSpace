@@ -5,17 +5,16 @@ import streamlit as st
 from cryptography.fernet import Fernet
 from hashlib import sha256
 
-# Function to generate a key and save it into a file
 def generate_key():
     key = Fernet.generate_key()
     with open("key.key", "wb") as key_file:
         key_file.write(key)
 
-# Function to load the key
+
 def load_key():
     return open("key.key", "rb").read()
 
-# Function to encrypt a message
+
 def encrypt_message(message, method, key=None, shift=3, keyword=None):
     if method == "Caesar Cipher":
         return ''.join(
@@ -52,7 +51,6 @@ def encrypt_message(message, method, key=None, shift=3, keyword=None):
     else:
         return None
 
-# Function to decrypt a message
 def decrypt_message(encrypted_message, method, key=None, shift=3, keyword=None):
     if method == "Caesar Cipher":
         return ''.join(
@@ -94,7 +92,6 @@ def decrypt_message(encrypted_message, method, key=None, shift=3, keyword=None):
     else:
         return None
 
-# Password manager class
 class PasswordManager:
     def __init__(self, key):
         self.key = key
@@ -123,28 +120,24 @@ class PasswordManager:
         except (FileNotFoundError, json.JSONDecodeError):
             return {}
 
-# Generate and load key if it doesn't already exist
 try:
     key = load_key()
 except FileNotFoundError:
     generate_key()
     key = load_key()
 
-# Create an instance of PasswordManager
+
 manager = PasswordManager(key)
 
-# Streamlit Sidebar for Navigation
+
 st.sidebar.title("Navigation")
 selection = st.sidebar.selectbox("Go to", ["Password Manager", "Text to Cipher"])
 
-# Title
 st.title("Cyberspace")
 
-# Password Manager Section
 if selection == "Password Manager":
     st.header("Password Manager")
 
-    # Add password section
     st.subheader("Add a New Password")
     service = st.text_input("Service")
     password = st.text_input("Password", type="password")
@@ -155,7 +148,6 @@ if selection == "Password Manager":
         else:
             st.error("Please provide both service and password.")
 
-    # Get password section
     st.subheader("Retrieve a Password")
     service_query = st.text_input("Service to Retrieve")
     if st.button("Get Password"):
@@ -168,19 +160,19 @@ if selection == "Password Manager":
         else:
             st.error("Please provide the service name.")
 
-# Text to Cipher Section
+
 elif selection == "Text to Cipher":
     st.header("Text to Cipher")
 
-    # Text input
+
     plain_text = st.text_area("Enter the plain text")
     cipher_text = st.text_area("Enter the cipher text for decryption")
 
-    # Encryption and Decryption Methods
+
     st.subheader("Encryption and Decryption Methods")
     method = st.selectbox("Select Method", ["Caesar Cipher", "Base64", "Hex", "ROT13", "Reverse", "SHA-256 Hash", "MD5 Hash", "Fernet Encrypt/Decrypt", "Vigenère Cipher"])
 
-    # Additional Inputs for Specific Methods
+
     shift = None
     keyword = None
     if method == "Caesar Cipher":
@@ -188,12 +180,12 @@ elif selection == "Text to Cipher":
     elif method == "Vigenère Cipher":
         keyword = st.text_input("Keyword")
 
-    # Encryption
+
     if plain_text:
         encrypted_text = encrypt_message(plain_text, method, key, shift, keyword)
         st.text_area(f"{method} Encrypted Text", encrypted_text, height=150)
 
-    # Decryption
+
     if cipher_text:
         decrypted_text = decrypt_message(cipher_text, method, key, shift, keyword)
         st.text_area(f"{method} Decrypted Text", decrypted_text, height=150)
